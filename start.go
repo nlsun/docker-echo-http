@@ -38,6 +38,8 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 		fallthrough
 	case "GET":
 		handleGet(w, r)
+	case "PATCH":
+		fallthrough
 	case "PUT":
 		fallthrough
 	case "POST":
@@ -50,6 +52,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 func handleGet(w http.ResponseWriter, r *http.Request) {
 	method := fmt.Sprintf("Method:\n%s", r.Method)
 	host := fmt.Sprintf("Host:\n%s", r.Host)
+	path := fmt.Sprintf("Path:\n%s", r.URL.Path)
 
 	var headerKeys []string
 	header := "Header:"
@@ -61,7 +64,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
 	}
 
-	strs := []string{method, host, header}
+	strs := []string{method, host, path, header}
 	resp := strings.Join(strs, "\n\n")
 
 	log.Print("\n" + resp)
@@ -71,6 +74,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 func handlePost(w http.ResponseWriter, r *http.Request) {
 	method := fmt.Sprintf("Method:\n%s", r.Method)
 	host := fmt.Sprintf("Host:\n%s", r.Host)
+	path := fmt.Sprintf("Path:\n%s", r.URL.Path)
 
 	var headerKeys []string
 	header := "Header:"
@@ -88,7 +92,7 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 	}
 	body := fmt.Sprintf("Body:\n%s", string(b))
 
-	strs := []string{method, host, header, body}
+	strs := []string{method, host, path, header, body}
 	resp := strings.Join(strs, "\n\n")
 
 	log.Print("\n" + resp)
