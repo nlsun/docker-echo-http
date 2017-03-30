@@ -37,19 +37,19 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		fallthrough
 	case "GET":
-		handleGet(w, r)
+		handleNoBody(w, r)
 	case "PATCH":
 		fallthrough
 	case "PUT":
 		fallthrough
 	case "POST":
-		handlePost(w, r)
+		handleWithBody(w, r)
 	default:
 		fmt.Fprintf(w, "%s unimplemented", r.Method)
 	}
 }
 
-func handleGet(w http.ResponseWriter, r *http.Request) {
+func handleNoBody(w http.ResponseWriter, r *http.Request) {
 	commonFields := commonParse(w, r)
 	resp := strings.Join(commonFields, "\n\n")
 
@@ -57,7 +57,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, resp)
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request) {
+func handleWithBody(w http.ResponseWriter, r *http.Request) {
 	commonFields := commonParse(w, r)
 
 	b, err := ioutil.ReadAll(r.Body)
