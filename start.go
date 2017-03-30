@@ -50,41 +50,15 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGet(w http.ResponseWriter, r *http.Request) {
-	method := fmt.Sprintf("Method:\n%s", r.Method)
-	host := fmt.Sprintf("Host:\n%s", r.Host)
-	path := fmt.Sprintf("Path:\n%s", r.URL.Path)
-
-	var headerKeys []string
-	header := "Header:"
-	for k, _ := range r.Header {
-		headerKeys = append(headerKeys, k)
-	}
-	sort.Strings(headerKeys)
-	for _, k := range headerKeys {
-		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
-	}
-
-	strs := []string{method, host, path, header}
-	resp := strings.Join(strs, "\n\n")
+	commonFields := commonParse(w, r)
+	resp := strings.Join(commonFields, "\n\n")
 
 	log.Print("\n" + resp)
 	fmt.Fprint(w, resp)
 }
 
 func handlePost(w http.ResponseWriter, r *http.Request) {
-	method := fmt.Sprintf("Method:\n%s", r.Method)
-	host := fmt.Sprintf("Host:\n%s", r.Host)
-	path := fmt.Sprintf("Path:\n%s", r.URL.Path)
-
-	var headerKeys []string
-	header := "Header:"
-	for k, _ := range r.Header {
-		headerKeys = append(headerKeys, k)
-	}
-	sort.Strings(headerKeys)
-	for _, k := range headerKeys {
-		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
-	}
+	commonFields := commonParse(w, r)
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -92,9 +66,27 @@ func handlePost(w http.ResponseWriter, r *http.Request) {
 	}
 	body := fmt.Sprintf("Body:\n%s", string(b))
 
-	strs := []string{method, host, path, header, body}
+	strs := append(commonFields, body)
 	resp := strings.Join(strs, "\n\n")
 
 	log.Print("\n" + resp)
 	fmt.Fprint(w, resp)
+}
+
+func commonParse(w http.ResponseWriter, r *http.Request) []string {
+	method := fmt.Sprintf("Method:\n%s", r.Method)
+	host := fmt.Sprintf("Host:\n%s", r.Host)
+	path := fmt.Sprintf("Path:\n%s", r.URL.Path)
+
+	var headerKeys []string
+	header := "Header:"
+	for k, _ := range r.Header {
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	for _, k := range headerKeys {
+		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
+	}
+
+	return []string{method, host, path, header}
 }
