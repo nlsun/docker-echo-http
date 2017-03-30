@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -49,7 +50,16 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 func handleGet(w http.ResponseWriter, r *http.Request) {
 	method := fmt.Sprintf("Method:\n%s", r.Method)
 	host := fmt.Sprintf("Host:\n%s", r.Host)
-	header := fmt.Sprintf("Header:\n%v", r.Header)
+
+	var headerKeys []string
+	header := "Header:"
+	for k, _ := range r.Header {
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	for _, k := range headerKeys {
+		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
+	}
 
 	strs := []string{method, host, header}
 	resp := strings.Join(strs, "\n\n")
@@ -61,7 +71,17 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 func handlePost(w http.ResponseWriter, r *http.Request) {
 	method := fmt.Sprintf("Method:\n%s", r.Method)
 	host := fmt.Sprintf("Host:\n%s", r.Host)
-	header := fmt.Sprintf("Header:\n%v", r.Header)
+
+	var headerKeys []string
+	header := "Header:"
+	for k, _ := range r.Header {
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	for _, k := range headerKeys {
+		header += fmt.Sprintf("\n%s=%s", k, strings.Join(r.Header[k], ","))
+	}
+
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Print(err)
